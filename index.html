@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>After Dark: 60 Shades to Climax</title>
+  <style>
+    :root {
+      --bg: #09090b;
+      --card-bg: #141418;
+      --primary: #e11d48;
+      --primary-hover: #be123c;
+      --gold: #f59e0b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #27272a;
+      --l1: #4f46e5;
+      --l2: #0284c7;
+      --l3: #ea580c;
+      --l4: #e11d48;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
+    body {
+      background: var(--bg);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 12px;
+      width: 100%;
+      max-width: 480px;
+    }
+    h1 {
+      font-size: 1.6rem;
+      letter-spacing: 2px;
+      color: #fff;
+      text-transform: uppercase;
+      font-weight: 900;
+    }
+    .subtitle {
+      font-size: 0.85rem;
+      color: var(--primary);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      padding: 8px 14px;
+      border-radius: 8px;
+      margin-top: 8px;
+      font-size: 0.85rem;
+    }
+    .active-player {
+      font-weight: 700;
+      color: #fff;
+    }
+    .board-container {
+      width: 100%;
+      max-width: 480px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 8px;
+      margin-bottom: 12px;
+    }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 4px;
+    }
+    .tile {
+      aspect-ratio: 1;
+      background: #18181b;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 3px;
+      font-size: 0.7rem;
+      position: relative;
+    }
+    .tile.l1 { border-color: rgba(79, 70, 229, 0.4); }
+    .tile.l2 { border-color: rgba(2, 132, 199, 0.4); }
+    .tile.l3 { border-color: rgba(234, 88, 12, 0.4); }
+    .tile.l4 { border-color: rgba(225, 29, 72, 0.7); background: #200d14; }
+    .tile-num { font-weight: 700; color: var(--text-muted); font-size: 0.65rem; }
+    .tile-tag { font-size: 0.5rem; font-weight: 800; border-radius: 2px; padding: 1px 3px; }
+    .tag-snake { background: #991b1b; color: #fff; }
+    .tag-ladder { background: #065f46; color: #fff; }
+    .players-holder {
+      display: flex;
+      gap: 3px;
+      min-height: 10px;
+    }
+    .p-token {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+    }
+    .p1-token { background: #38bdf8; box-shadow: 0 0 6px #38bdf8; }
+    .p2-token { background: #f43f5e; box-shadow: 0 0 6px #f43f5e; }
+    .controls {
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .btn {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 13px;
+      border-radius: 8px;
+      font-weight: 800;
+      font-size: 0.95rem;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .btn:active { background: var(--primary-hover); transform: scale(0.99); }
+    .btn-secondary {
+      background: #27272a;
+      color: var(--text-main);
+      font-size: 0.8rem;
+      padding: 9px;
+    }
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 100;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-content {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+    }
+    .modal-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .modal-desc {
+      font-size: 0.95rem;
+      color: #d1d5db;
+      line-height: 1.5;
+      margin-bottom: 18px;
+    }
+    .gatekeeper {
+      border: 2px solid var(--primary);
+      box-shadow: 0 0 24px rgba(225, 29, 72, 0.4);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>After Dark</h1>
+    <div class="subtitle">60 Shades to Climax</div>
+    <div class="status-bar">
+      <span id="turnIndicator" class="active-player">Player 1's Turn</span>
+      <span id="posIndicator">P1: Tile 1 | P2: Tile 1</span>
+    </div>
+  </header>
+
+  <div class="board-container">
+    <div class="board" id="boardGrid"></div>
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="rollBtn" onclick="takeTurn()">Roll Dice</button>
+    <button class="btn btn-secondary" onclick="resetGame()">Reset Game</button>
+  </div>
+
+  <!-- Regular Dare Modal -->
+  <div class="modal-overlay" id="taskModal">
+    <div class="modal-content">
+      <div class="modal-title" id="taskTitle">Task</div>
+      <div class="modal-desc" id="taskDesc"></div>
+      <button class="btn" onclick="closeTaskModal()">Completed</button>
+    </div>
+  </div>
+
+  <!-- Mandatory Gatekeeper Modal -->
+  <div class="modal-overlay" id="gateModal">
+    <div class="modal-content gatekeeper">
+      <div class="modal-title" style="color: var(--primary);">The Climax Threshold Reached</div>
+      <div class="modal-desc">
+        Entering the final 15 shades requires complete surrender.<br><br>
+        <strong>MANDATORY RULE:</strong> Both players must completely undress before proceeding with Level 4 dares.
+      </div>
+      <button class="btn" onclick="unlockClimax()">[ We Are Both Stripped — Unlock Climax ]</button>
+    </div>
+  </div>
+
+  <script>
+    // Short Ladders (+2/+3 tiles) and Deep Setback Snakes
+    const SNAKES = { 59: 20, 48: 32, 38: 18, 25: 12 };
+    const LADDERS = { 5: 8, 14: 17, 27: 30, 42: 45 };
+
+    const TASKS = {
+      1: [
+        "Whisper your deepest, naughtiest desire into your partner's ear.",
+        "Slowly kiss your partner's neck and collarbone for 20 seconds.",
+        "Maintain unbroken eye contact while lightly biting your lip for 15 seconds.",
+        "Gently massage your partner's shoulders while whispering praise."
+      ],
+      2: [
+        "Unbutton or remove one piece of clothing from your partner.",
+        "Trace your partner's lips and chest using only your fingertips.",
+        "Kiss your partner anywhere they command for 30 seconds.",
+        "Give your partner a slow, sensual body tease without kissing their lips."
+      ],
+      3: [
+        "Blindfold your partner and kiss their most sensitive spots for 1 full minute.",
+        "Remove your partner's shirt or top using only your teeth.",
+        "Give a slow lap dance to your partner for 45 seconds.",
+        "Run an ice cube or warm breath along your partner's inner thighs."
+      ],
+      4: [
+        "Mutual stripped foreplay for 3 minutes without full contact.",
+        "Give your partner a completely naked, slow full-body massage.",
+        "Spend 2 uninterrupted minutes bringing your partner right to the edge.",
+        "Final surrender: The winner commands how the night finishes."
+      ]
+    };
+
+    let p1 = 1, p2 = 1, turn = 1;
+    let gateUnlocked = false;
+    let pendingMoveTarget = null;
+
+    function renderBoard() {
+      const grid = document.getElementById("boardGrid");
+      grid.innerHTML = "";
+      for (let i = 1; i <= 60; i++) {
+        const tile = document.createElement("div");
+        const lvl = i <= 15 ? "l1" : i <= 30 ? "l2" : i <= 45 ? "l3" : "l4";
+        tile.className = `tile ${lvl}`;
+        
+        let tag = "";
+        if (SNAKES[i]) tag = '<span class="tile-tag tag-snake">SNAKE</span>';
+        if (LADDERS[i]) tag = '<span class="tile-tag tag-ladder">LADDER</span>';
+
+        tile.innerHTML = `
+          <div style="display:flex; justify-content:space-between; width:100%;">
+            <span class="tile-num">${i}</span>
+            ${tag}
+          </div>
+          <div class="players-holder">
+            ${p1 === i ? '<div class="p-token p1-token"></div>' : ''}
+            ${p2 === i ? '<div class="p-token p2-token"></div>' : ''}
+          </div>
+        `;
+        grid.appendChild(tile);
+      }
+      document.getElementById("posIndicator").innerText = `P1: Tile ${p1} | P2: Tile ${p2}`;
+    }
+
+    function takeTurn() {
+      const roll = Math.floor(Math.random() * 6) + 1;
+      let curr = turn === 1 ? p1 : p2;
+      let target = Math.min(60, curr + roll);
+
+      // Climax Threshold Check (Tile 45 -> 46+)
+      if (curr <= 45 && target >= 46 && !gateUnlocked) {
+        pendingMoveTarget = target;
+        document.getElementById("gateModal").classList.add("active");
+        return;
+      }
+
+      applyMove(target, roll);
+    }
+
+    function applyMove(target, roll) {
+      let note = "";
+      if (SNAKES[target]) {
+        target = SNAKES[target];
+        note = " (Bit by a Snake!)";
+      } else if (LADDERS[target]) {
+        target = LADDERS[target];
+        note = " (Climbed a Ladder!)";
+      }
+
+      if (turn === 1) p1 = target; else p2 = target;
+      renderBoard();
+
+      const lvl = target <= 15 ? 1 : target <= 30 ? 2 : target <= 45 ? 3 : 4;
+      const taskPool = TASKS[lvl];
+      const task = taskPool[Math.floor(Math.random() * taskPool.length)];
+
+      document.getElementById("taskTitle").innerText = `Player ${turn} Rolled a ${roll}${note}`;
+      document.getElementById("taskDesc").innerHTML = `<strong>Level ${lvl} Dare (Tile ${target}):</strong><br><br>${task}`;
+      document.getElementById("taskModal").classList.add("active");
+    }
+
+    function closeTaskModal() {
+      document.getElementById("taskModal").classList.remove("active");
+      turn = turn === 1 ? 2 : 1;
+      document.getElementById("turnIndicator").innerText = `Player ${turn}'s Turn`;
+    }
+
+    function unlockClimax() {
+      gateUnlocked = true;
+      document.getElementById("gateModal").classList.remove("active");
+      if (pendingMoveTarget !== null) {
+        const target = pendingMoveTarget;
+        pendingMoveTarget = null;
+        applyMove(target, "Threshold");
+      }
+    }
+
+    function resetGame() {
+      p1 = 1; p2 = 1; turn = 1; gateUnlocked = false; pendingMoveTarget = null;
+      document.getElementById("turnIndicator").innerText = "Player 1's Turn";
+      renderBoard();
+    }
+
+    renderBoard();
+  </script>
+</body>
+</html>
